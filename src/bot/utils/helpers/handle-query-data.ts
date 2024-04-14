@@ -8,6 +8,8 @@ import { handleStandingSelection } from '../../../football/handle-standing-selec
 import { handleTeamSelection } from '../../../football/handle-teams-option';
 import { handleTeamInfoSelection } from '../../../football/handle-team-info';
 import { handleTopScoresSelection } from '../../../football/handle-top-scores-selection';
+import { handleLandmarksOption } from '../../../landmarks/handle-landmarks-options';
+import { handleLandmarksSelection } from '../../../landmarks/handle-landmark-selection';
 
 export async function handleQueryData(
   chatId: ChatId,
@@ -31,5 +33,9 @@ export async function handleQueryData(
     await handleTeamInfoSelection(chatId, data);
   } else if (data === 'football_top_score') {
     await handleTopScoresSelection(chatId);
+  } else if (data === 'get_landmarks') {
+    await handleLandmarksOption(chatId);
+  } else if (data.startsWith('landmark_')) {
+    await handleLandmarksSelection(chatId, data);
   }
 }
