@@ -17,6 +17,9 @@ export async function handleTeamInfoSelection(
       const coachesMessage = await formatCoaches(team);
       const playersMessage = await formatPlayers(team);
 
+      // Sending the team logo with a caption
+      await bot.sendPhoto(chatId, team.team_logo, { caption: "Team Logo" });
+
       const message = coachesMessage + playersMessage;
 
       bot.sendMessage(chatId, message, { parse_mode: 'HTML' });
