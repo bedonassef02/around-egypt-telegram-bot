@@ -1,7 +1,8 @@
 import { ChatId } from 'node-telegram-bot-api';
 import { bot } from '../bot';
-import { fetchConversionRate } from './api/conversion-rate.api';
-import { currencyEmojis } from './constants';
+import { performCurrencyConversion } from './utils/helpers/perform-currency-conversion';
+import { formatCurrencyMessage } from './utils/helpers/format-currency-message';
+import { sendMessageWithCurrencyConversion } from './utils/helpers/send-message-with-currency-conversion';
 
 export async function handleCurrencySelection(
   chatId: ChatId,
@@ -11,26 +12,27 @@ export async function handleCurrencySelection(
   const [fromCurrency, toCurrency] = data.split('_').slice(1);
 
   try {
-    const conversionRate: number = await fetchConversionRate(
+    const conversionRate: number | null = await performCurrencyConversion(
       fromCurrency,
       toCurrency,
     );
 
-    if (conversionRate) {
-      // Perform the conversion (assuming amount is 1 unit for simplicity)
-      const convertedAmount: number = 1 * conversionRate;
-
-      // Send the result back to the user with fromCurrency displayed first followed by its emoji
-      bot.sendMessage(
-        chatId,
-        `1 ${fromCurrency} ${currencyEmojis[fromCurrency]} equals ${convertedAmount.toFixed(2)} ${currencyEmojis[toCurrency]} ${toCurrency}`,
+    if (conversionRate !== null) {
+      const message: string = formatCurrencyMessage(
+        fromCurrency,
+        toCurrency,
+        conversionRate,
       );
+      await sendMessageWithCurrencyConversion(chatId, message);
     } else {
-      bot.sendMessage(chatId, 'Failed to fetch currency conversion data.');
+      await bot.sendMessage(
+        chatId,
+        'Failed to fetch currency conversion data.',
+      );
     }
   } catch (error) {
     console.error('Error handling currency selection:', error);
-    bot.sendMessage(
+    await bot.sendMessage(
       chatId,
       'An error occurred while processing your request. Please try again later.',
     );

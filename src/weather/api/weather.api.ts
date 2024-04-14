@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const OPEN_WEATHER_MAP_API_KEY = process.env.OPENWEATHERMAP_API_KEY as string;
+const OPEN_WEATHER_MAP_API_KEY = process.env.OPEN_WEATHER_MAP_API_KEY as string;
 
 // Function to fetch weather data
 export async function getWeather(cityName: string): Promise<any> {

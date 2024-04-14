@@ -1,25 +1,24 @@
 import { ChatId } from 'node-telegram-bot-api';
 import { bot } from '../bot';
-import { currencyOptions } from './constants';
+import { constructInlineKeyboardOptions } from './utils/helpers/construct-inline-keyboard-options';
+import { sendMessageWithInlineKeyboard } from './utils/helpers/send-message-with-inline-keyboard';
 
-// Function to construct currency conversion options
 export async function constructCurrencyConversionOptions(
   chatId: ChatId,
 ): Promise<void> {
-  // Splitting currency options into pairs for inline keyboard display
-  const inlineKeyboard: { text: string; callback_data: string }[][] = [];
-  for (let i = 0; i < currencyOptions.length; i += 2) {
-    const line: { text: string; callback_data: string }[] = [];
-    line.push(currencyOptions[i]);
-    if (i + 1 < currencyOptions.length) {
-      line.push(currencyOptions[i + 1]);
-    }
-    inlineKeyboard.push(line);
+  try {
+    const inlineKeyboardOptions = await constructInlineKeyboardOptions();
+    const messageOptions = {
+      reply_markup: {
+        inline_keyboard: inlineKeyboardOptions,
+      },
+    };
+    await sendMessageWithInlineKeyboard(chatId, messageOptions);
+  } catch (error) {
+    console.error('Error constructing currency conversion options:', error);
+    await bot.sendMessage(
+      chatId,
+      'An error occurred while processing your request. Please try again later.',
+    );
   }
-
-  bot.sendMessage(chatId, 'Select a currency:', {
-    reply_markup: {
-      inline_keyboard: inlineKeyboard,
-    },
-  });
 }

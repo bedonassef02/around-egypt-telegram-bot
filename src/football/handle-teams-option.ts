@@ -1,29 +1,17 @@
-import { ChatId, InlineKeyboardMarkup } from 'node-telegram-bot-api'; // Import InlineKeyboardMarkup
+import { ChatId } from 'node-telegram-bot-api';
 import { bot } from '../bot';
 import { getTeams } from './api/teams.api';
 import { Team } from './utils/types/team.type';
-import { chunkArray } from './utils/helpers/chuck-array';
+import { createKeyboardMarkup } from './utils/helpers/create-keyboard-markup';
+import { sendMessageWithKeyboard } from './utils/helpers/sen-message-wit-keyboard';
 
-// Function to handle team selection
 export async function handleTeamSelection(chatId: ChatId): Promise<void> {
   try {
     const teams: Team[] = await getTeams();
 
     if (teams && teams.length > 0) {
-      const keyboard = {
-        inline_keyboard: chunkArray(teams, 2).map((chunk) =>
-          chunk.map((team) => ({
-            text: team.team_name,
-            callback_data: `team_${team.team_key}`, // You can replace this with a unique identifier for each team
-          })),
-        ),
-      };
-
-      const options = {
-        reply_markup: keyboard as InlineKeyboardMarkup, // Cast keyboard to InlineKeyboardMarkup
-      };
-
-      bot.sendMessage(chatId, 'Please select a team:', options);
+      const keyboard = await createKeyboardMarkup(teams);
+      await sendMessageWithKeyboard(chatId, 'Please select a team:', keyboard);
     } else {
       bot.sendMessage(chatId, 'Failed to fetch team data.');
     }

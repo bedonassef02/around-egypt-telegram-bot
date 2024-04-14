@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 dotenv.config();
 import { bot } from './bot';
 import { sendInitialOptions } from './bot/utils/helpers/set-initial-state';
